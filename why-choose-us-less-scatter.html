@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Why Clients Choose Grope Hamilton Lawyers</title>
+  <style>
+    /* Reset default margins */
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+      background-color: #000000;
+    }
+
+    /* Fullscreen canvas for the starfield */
+    #starCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 1;
+    }
+
+    /* Container holding all star-items and title */
+    .overlay {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+    }
+
+    /* Title text at top center */
+    .title {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-align: center;
+      text-shadow: 0 0 8px #ffffff;
+    }
+
+    /* Each star bullet and its content, positioned absolutely later */
+    .star-item {
+      position: absolute;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* The "star" bullet as a realistic glowing point (pure white circle with glow) */
+    .star {
+      width: 10px;
+      height: 10px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 15px 8px #ffffff;
+      animation: twinkle 2s infinite ease-in-out;
+      transition: transform 0.2s ease;
+      margin: 0 auto;
+    }
+    .star:hover {
+      transform: scale(2);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Hidden content area that toggles */
+    .content {
+      display: none;
+      position: absolute;
+      top: 15px; /* below the star */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #444;
+      border-radius: 4px;
+      line-height: 1.4;
+      font-size: 13px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* When content is visible */
+    .content.show {
+      display: block;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Three.js starfield background -->
+  <canvas id="starCanvas"></canvas>
+
+  <!-- Overlay with scattered stars and title -->
+  <div class="overlay">
+    <!-- Title text -->
+    <div class="title">Why Clients Choose Grope Hamilton Lawyers</div>
+
+    <!-- Each star-item will be positioned randomly within closer range by JavaScript -->
+    <div class="star-item" data-target="item1">
+      <div class="star"></div>
+      <div id="item1" class="content">
+        With over 42 years of continuous practice, we’ve earned the trust of generations of clients across a broad range of wills and estate matters. We are a proud Law Society of South Australia Gold Alliance Firm, recognised for our commitment to professionalism and ethical practice.
+      </div>
+    </div>
+
+    <div class="star-item" data-target="item2">
+      <div class="star"></div>
+      <div id="item2" class="content">
+        We provide advice that is both legally accurate and easy to understand. Clients come to us for guidance they can rely on—without jargon, and without assumptions.
+      </div>
+    </div>
+
+    <div class="star-item" data-target="item3">
+      <div class="star"></div>
+      <div id="item3" class="content">
+        Every matter is different. We tailor our services to your circumstances, with a focus on achieving practical, legally sound results and minimising the risk of future disputes.
+      </div>
+    </div>
+
+    <div class="star-item" data-target="item4">
+      <div class="star"></div>
+      <div id="item4" class="content">
+        We recognise the sensitivity of estate planning. Clients are treated with courtesy, discretion and genuine care throughout the process.
+      </div>
+    </div>
+
+    <div class="star-item" data-target="item5">
+      <div class="star"></div>
+      <div id="item5" class="content">
+        We offer clear, upfront pricing with fixed-fee options where appropriate. You’ll always know what to expect—and why it matters.
+      </div>
+    </div>
+
+    <div class="star-item" data-target="item6">
+      <div class="star"></div>
+      <div id="item6" class="content">
+        We offer multilingual support to assist clients from diverse cultural and linguistic backgrounds.
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js and interactivity scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    // ------------ THREE.JS STARFIELD INITIALIZATION ------------
+
+    // Grab the canvas element
+    const canvas = document.getElementById('starCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Create scene and camera
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    // OrbitControls (allows slight mouse drag movement)
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = false;
+    controls.enablePan = false;
+
+    // Create starfield geometry
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 20000;
+    const positions = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i++) {
+      const i3 = i * 3;
+      positions[i3] = (Math.random() - 0.5) * 3000;
+      positions[i3 + 1] = (Math.random() - 0.5) * 3000;
+      positions[i3 + 2] = (Math.random() - 0.5) * 3000;
+    }
+
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    // Create material and points
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 1.5 });
+    const starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      starField.rotation.y += 0.0007;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    });
+
+    // ------------ SCATTER AND INTERACTIVITY FOR STAR-ITEMS ------------
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const items = Array.from(document.querySelectorAll('.star-item'));
+      const positionsArr = [];
+
+      items.forEach(item => {
+        let x, y;
+        let safe = false;
+        while (!safe) {
+          x = Math.random() * 60 + 20; // between 20% and 80%
+          y = Math.random() * 60 + 20; // between 20% and 80%
+          safe = positionsArr.every(pos => {
+            const dx = pos.x - x;
+            const dy = pos.y - y;
+            return Math.sqrt(dx*dx + dy*dy) > 15; // at least 15 units apart
+          });
+        }
+        positionsArr.push({ x, y });
+        item.style.left = x + 'vw';
+        item.style.top = y + 'vh';
+
+        // Toggle content on click
+        const star = item.querySelector('.star');
+        const contentDiv = item.querySelector('.content');
+        star.addEventListener('click', (e) => {
+          // Close others
+          document.querySelectorAll('.content.show').forEach(openDiv => {
+            openDiv.classList.remove('show');
+          });
+          contentDiv.classList.toggle('show');
+          e.stopPropagation();
+        });
+      });
+
+      // Click outside to close
+      document.body.addEventListener('click', () => {
+        document.querySelectorAll('.content.show').forEach(openDiv => {
+          openDiv.classList.remove('show');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

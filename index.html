@@ -95,6 +95,19 @@
       display: block;
       pointer-events: auto;
     }
+    /* 默认隐藏这一条 <br> */
+.mobile-br {
+  display: none;
+}
+/* 当屏宽 ≤ 600px 时，才显示 <br> 并允许标题换行 */
+@media (max-width: 600px) {
+  .title {
+    white-space: normal;  /* 允许换行 */
+  }
+  .mobile-br {
+    display: inline;      /* 手机端才显示换行 */
+  }
+}
   </style>
 </head>
 
@@ -105,7 +118,9 @@
   <!-- Overlay with scattered stars and title -->
   <div class="overlay">
     <!-- Title text -->
-    <div class="title">Why Clients Choose Grope Hamilton Lawyers</div>
+   <div class="title">
+  Why Clients Choose<span class="mobile-br"><br></span>Grope Hamilton Lawyers
+</div>
 
     <!-- Each star-item will be positioned randomly within closer range by JavaScript -->
     <div class="star-item" data-target="item1">
@@ -118,7 +133,7 @@
     <div class="star-item" data-target="item2">
       <div class="star"></div>
       <div id="item2" class="content">
-        We provide advice that is both legally accurate and easy to understand. Clients come to us for guidance they can rely on—without jargon, and without assumptions.
+        We provide advice that is both legally accurate and easy to understand. Clients come to us for guidance they can rely on, without jargon and assumptions.
       </div>
     </div>
 
@@ -139,7 +154,7 @@
     <div class="star-item" data-target="item5">
       <div class="star"></div>
       <div id="item5" class="content">
-        We offer clear, upfront pricing with fixed-fee options where appropriate. You’ll always know what to expect—and why it matters.
+        We offer clear, upfront pricing with fixed-fee options where appropriate. You’ll always know what to expect and why it matters.
       </div>
     </div>
 

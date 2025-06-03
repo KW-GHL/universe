@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>3D Universe</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="universe"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+  const canvas = document.getElementById('universe');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 50;
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
+  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  for (let i = 0; i < 10; i++) {
+    const star = new THREE.Mesh(geometry, material);
+    star.position.set(Math.random() * 60 - 30, Math.random() * 60 - 30, Math.random() * 60 - 30);
+    scene.add(star);
+  }
+
+  const light = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(light);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }, false);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+</body>
+</html>

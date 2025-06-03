@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D 星空动画 + Why Clients Choose Us</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
+    canvas { display: block; position: absolute; top: 0; left: 0; }
+    .content {
+      position: relative;
+      z-index: 1;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      max-width: 600px;
+      margin: 40px auto;
+      border-radius: 12px;
+    }
+    .content h1 { margin-bottom: 10px; }
+    .content p { margin: 5px 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <canvas id="universe"></canvas>
+  <div class="content">
+    <h1>Why Clients Choose Grope Hamilton Lawyers</h1>
+    <p><strong>Trusted Legal Experience</strong>: With over 42 years of continuous practice, we’ve earned the trust of generations of clients across a broad range of wills and estate matters. We are a proud Law Society of South Australia Gold Alliance Firm.</p>
+    <p><strong>Clear, Practical Advice</strong>: We provide advice that is both legally accurate and easy to understand—without jargon or assumptions.</p>
+    <p><strong>Personalised, Outcome-Driven Approach</strong>: Every matter is different. We tailor our services to your circumstances, focusing on achieving practical, legally sound results.</p>
+    <p><strong>Respectful and Responsive Service</strong>: Clients are treated with courtesy, discretion and genuine care throughout the process.</p>
+    <p><strong>Transparent and Cost-Effective</strong>: We offer clear, upfront pricing with fixed-fee options where appropriate. You’ll always know what to expect.</p>
+    <p><strong>Multilingual Capability</strong>: We offer multilingual support to assist clients from diverse cultural and linguistic backgrounds.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const canvas = document.getElementById('universe');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 10000;
+    const positions = [];
+    for (let i = 0; i < starCount; i++) {
+      const x = (Math.random() - 0.5) * 2000;
+      const y = (Math.random() - 0.5) * 2000;
+      const z = (Math.random() - 0.5) * 2000;
+      positions.push(x, y, z);
+    }
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+    const starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      starField.rotation.y += 0.0005;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

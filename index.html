@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D 交互星空 + 可点击文字</title>
+  <style>
+    html, body {
+      margin: 0; 
+      padding: 0; 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden; 
+      background: black;
+    }
+    /* Three.js 渲染画布 */
+    #three-container {
+      position: absolute; 
+      top: 0; left: 0;
+      width: 100%; 
+      height: 100%;
+      z-index: 0;
+    }
+    /* 标签层（CSS2DRenderer 产生的 DOM） */
+    #label-container {
+      position: absolute; 
+      top: 0; left: 0;
+      width: 100%; 
+      height: 100%;
+      pointer-events: none; /* 仅让 Three.js 画布接收点击 */
+      z-index: 1;
+    }
+    /* 标签文字样式 */
+    .label {
+      font-family: Arial, sans-serif;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 14px;
+      transform: translate(-50%, -50%);
+      pointer-events: auto; /* 标签本身不拦截鼠标，点击穿透到画布 */
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .label:hover {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Three.js 渲染的容器 -->
+  <div id="three-container"></div>
+  <!-- CSS2DRenderer 生成的 DOM 容器，用于放置文字标签 -->
+  <div id="label-container"></div>
+
+  <!-- 引入 Three.js 核心 & OrbitControls & CSS2DRenderer -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/renderers/CSS2DRenderer.js"></script>
+  <script>
+    // ========== 初始化场景、相机、渲染器 ==========
+    const container = document.getElementById('three-container');
+    const labelContainer = document.getElementById('label-container');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      5000
+    );
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const labelRenderer = new THREE.CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelContainer.appendChild(labelRenderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+    controls.minDistance = 2;
+    controls.maxDistance = 1000;
+
+    // ========== 创建星空粒子 ==========
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 15000;
+    const positions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 2000;
+      positions[i + 1] = (Math.random() - 0.5) * 2000;
+      positions[i + 2] = (Math.random() - 0.5) * 2000;
+    }
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
+    const starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+
+    // ========== 定义“文字星星”点位 ==========
+    const pointsOfInterest = [
+      {
+        name: 'Trusted Legal Experience',
+        description: 'With over 42 years of continuous practice, we’ve earned the trust of generations of clients across a broad range of wills and estate matters.',
+        position: new THREE.Vector3(200, 150, -400),
+      },
+      {
+        name: 'Clear, Practical Advice',
+        description: 'We provide advice that is both legally accurate and easy to understand—without jargon or assumptions.',
+        position: new THREE.Vector3(-300, -100, -500),
+      },
+      {
+        name: 'Personalised, Outcome-Driven Approach',
+        description: 'We tailor our services to your circumstances, focusing on achieving practical, legally sound results.',
+        position: new THREE.Vector3(400, -200, -300),
+      },
+      {
+        name: 'Respectful and Responsive Service',
+        description: 'Clients are treated with courtesy, discretion and genuine care throughout the process.',
+        position: new THREE.Vector3(-150, 250, -350),
+      },
+      {
+        name: 'Transparent and Cost-Effective',
+        description: 'We offer clear, upfront pricing with fixed-fee options where appropriate. You’ll always know what to expect.',
+        position: new THREE.Vector3(0, -300, -450),
+      },
+      {
+        name: 'Multilingual Capability',
+        description: 'We offer multilingual support to assist clients from diverse cultural and linguistic backgrounds.',
+        position: new THREE.Vector3(250, 0, -600),
+      },
+    ];
+
+    const poiLabels = [];
+    pointsOfInterest.forEach((poi) => {
+      // 1. 创建一个小型圆形 Sprite 当作“星星点击点”
+      const spriteMap = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/disc.png');
+      const spriteMaterial = new THREE.SpriteMaterial({ map: spriteMap, color: 0xffaa00, transparent: true, opacity: 0.9, sizeAttenuation: false });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.position.copy(poi.position);
+      sprite.scale.set(10, 10, 1);
+      scene.add(sprite);
+
+      // 2. 创建一个 CSS2D 标签
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = poi.name;
+      div.title = poi.description;
+      div.onclick = () => {
+        alert(poi.name + '\\n\\n' + poi.description);
+      };
+
+      const label = new THREE.CSS2DObject(div);
+      label.position.copy(poi.position);
+      scene.add(label);
+
+      poiLabels.push({ sprite, label, data: poi });
+    });
+
+    // ========== 射线投射器（Raycaster）检测点击 ==========
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function onMouseClick(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(poiLabels.map(p => p.sprite), false);
+      if (intersects.length > 0) {
+        const hitSprite = intersects[0].object;
+        const hitData = poiLabels.find(p => p.sprite === hitSprite);
+        if (hitData) {
+          alert(hitData.data.name + '\\n\\n' + hitData.data.description);
+        }
+      }
+    }
+    window.addEventListener('click', onMouseClick, false);
+
+    // ========== 渲染循环 ==========
+    function animateScene() {
+      requestAnimationFrame(animateScene);
+      starField.rotation.y += 0.0003;
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+      controls.update();
+    }
+    animateScene();
+
+    // ========== 窗口自适应 ==========
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
